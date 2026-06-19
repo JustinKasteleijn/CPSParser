@@ -24,6 +24,7 @@ spec = do
     testNatCombinator
     testIntCombinator
     testBoundedCombinator
+    testLinesCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -136,3 +137,8 @@ testBoundedCombinator = describe "Int combinator" $ do
     runTestParser (parseUnsignedBounded :: Parser String String Word8) "0"   ==> (0, "")
   it "Rejects value outside of min and max bound (u8)" $ do
     runTestParser (parseUnsignedBounded :: Parser String String Word8) "257" ==? (expectedButGot "257" "a value between 0 and 255" "", "")
+
+testLinesCombinator :: Spec
+testLinesCombinator = describe "Lines combinator" $ do
+  it "Consumes parser between lines" $ do
+    runTestParser (lines1 int) "123\n456\n789" ==> ([123,456,789], "")

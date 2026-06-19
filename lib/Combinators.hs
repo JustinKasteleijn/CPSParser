@@ -77,7 +77,7 @@ alpha0 = many alpha
 alpha1 :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e [Elem s]
 alpha1 = some alpha
 
-sepBy1 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
+sepBy1 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e a -> Parser s e [a]
 sepBy1 psep parser = (:) <$> parser <*> many (psep >> parser)
 
 sepBy0 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
@@ -103,6 +103,9 @@ whitespace1 = void $ some whitespace
 
 whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
 whitespace0 = void $ many whitespace
+
+lines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e a -> Parser s e [a]
+lines1 = sepBy1 newline
 
 -----------------------------------------------------------------
 -- Numbers
