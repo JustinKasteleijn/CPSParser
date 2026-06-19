@@ -16,7 +16,8 @@ spec = do
     testTabCombinator
     testAlphaCombinator
     testSepByCombinators
-
+    testCharCombinator
+    testStringCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -72,3 +73,13 @@ testSepByCombinators = describe "Sepby combinators" $ do
     runTestParser (sepBy1 (char ',') item) ""     ==? (unexpectedEOF "", "")
   it "SepBy0 succeeds on empty input" $ do
     runTestParser (sepBy0 (char ',') item) ""     ==> ([], "")
+
+testCharCombinator :: Spec
+testCharCombinator = describe "Char combinator" $ do
+  it "Consumes a single char on populated input" $ do
+    runTestParser (char 'p') "pp" ==> ('p', "p")
+
+testStringCombinator :: Spec
+testStringCombinator = describe "String combinator" $ do
+  it "consumes a string when string is given" $ do
+    runTestParser (string "hello") "hello" ==> ("hello", "")
