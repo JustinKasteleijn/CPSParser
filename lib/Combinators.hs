@@ -5,11 +5,14 @@ module Combinators where
 
 import           Control.Applicative  (many, optional, some, (<|>))
 import           Control.Monad        (void)
+import           Data.Char            (digitToInt)
+import           Data.List            (foldl')
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..))
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
 import           Predicates.IsAlpha   (IsAlpha (..))
 import           Predicates.IsDigit   (IsDigit (..))
+import           Predicates.IsMinus   (IsMinus (..))
 import           Predicates.IsNewline (IsNewline (..))
 import           Predicates.IsSpace   (IsSpace (..))
 import           Predicates.IsTab     (IsTab (..))
@@ -38,11 +41,11 @@ string = mapM char
 digit :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e (Elem s)
 digit = satisfy isDigit "digit '0..9'" show
 
-digit0 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e [Elem s]
-digit0 = many digit
+digits0 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e [Elem s]
+digits0 = many digit
 
-digit1 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e [Elem s]
-digit1 = some digit
+digits1 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e [Elem s]
+digits1 = some digit
 
 newline :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e (Elem s)
 newline = satisfy isNewline "\n" show
@@ -97,3 +100,13 @@ whitespace1 = void $ some whitespace
 
 whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
 whitespace0 = void $ many whitespace
+
+unsignedInt :: (Parsable s, ParserError s e, IsDigit (Elem s),Show (Elem s), Num n) => Parser s e n
+unsignedInt = foldl' (\acc d -> acc * 10 + toDigit d) 0 <$> digits1
+
+signedInt :: (Parsable s, ParserError s e, IsDigit (Elem s), IsMinus (Elem s) ,Show (Elem s), Num n) => Parser s e n
+signedInt = do
+   f <- option id (negate <$ satisfy isMinus "'-'" show)
+   f <$> unsignedInt
+  where
+    option def p = p <|> pure def

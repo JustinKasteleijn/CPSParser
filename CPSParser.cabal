@@ -27,7 +27,8 @@ library
                       Predicates.IsNewline,
                       Predicates.IsTab,
                       Predicates.IsAlpha,
-                      Predicates.IsSpace
+                      Predicates.IsSpace,
+                      Predicates.IsMinus
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.18.3.0,

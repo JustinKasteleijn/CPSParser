@@ -2,6 +2,7 @@ module CombinatorsSpec (spec) where
 
 import           Combinators
 import           CustomTestLib
+import           Parser        (Parser)
 import           ParserError
 import           Test.Syd
 
@@ -20,6 +21,8 @@ spec = do
     testStringCombinator
     testBetweenCombinator
     testWhitespaceCombinator
+    testNatCombinator
+    testIntCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -107,3 +110,17 @@ testWhitespaceCombinator = describe "Whitespace combinator" $ do
      runTestParser whitespace " " ==> ((), "")
   it "Fails on non whitespace character" $ do
     runTestParser whitespace "c"  ==? (expectedButGot "'c'" "whitespace" "", "c")
+
+testNatCombinator :: Spec
+testNatCombinator = describe "Nat combinatot" $ do
+  it "Consumes a single number and returns it as integer" $ do
+    runTestParser (unsignedInt :: Parser String String Int) "1" ==> (1, "")
+  it "Consumes multiple numbers as a single integer" $ do
+    runTestParser (unsignedInt :: Parser String String Int) "123" ==> (123, "")
+  it "Fails when a negative integer is given" $ do
+    runTestParser (unsignedInt :: Parser String String Int) "-12" ==? (expectedButGot "'-'" "digit '0..9'" "", "-12")
+
+testIntCombinator :: Spec
+testIntCombinator = describe "Int combinator" $ do
+  it "Consumes negative numbers as negative integers" $ do
+    runTestParser (signedInt :: Parser String String Int) "-123" ==> (-123, "")
