@@ -1,0 +1,44 @@
+# ==========================================
+# 1. HASKELL BUILD ARTIFACTS (Cabal & GHC)
+# ==========================================
+dist/
+dist-*
+cabal.project.local
+cabal.project.local~
+.ghc.environment.*
+
+# ==========================================
+# 2. STACK ARTIFACTS (If you switch to stack)
+# ==========================================
+.stack-work/
+stack.yaml.lock
+
+# ==========================================
+# 3. COMPILER OUTPUTS & TEMP FILES
+# ==========================================
+*.o
+*.hi
+*.chi
+*.chs.h
+*.dyn_o
+*.dyn_hi
+.hie/
+
+# ==========================================
+# 4. TESTING & COVERAGE REPORTING
+# ==========================================
+.hpc/
+*.tix
+*.html
+
+# ==========================================
+# 5. SYSTEM & EDITOR CLUTTER
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+.zed
