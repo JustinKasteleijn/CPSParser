@@ -1,12 +1,16 @@
-{-# LANGUAGE InstanceSigs  #-}
-{-# LANGUAGE TypeFamilies  #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE InstanceSigs         #-}
+{-# LANGUAGE MultiWayIf           #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Parsable where
 
-import qualified Data.Text as T
-import           Parser    (Parser)
-import           Position  (Position (..), Positional (..))
+import qualified Data.Text            as T
+import           Parser               (Parser)
+import           Position             (Position (..), Positional (..))
+import           Predicates.IsNewline (IsNewline (..))
+import           Predicates.IsTab     (IsTab (..))
 
 class Parsable s where
   type Elem s
@@ -25,16 +29,15 @@ instance Parsable T.Text where
   uncons :: T.Text -> Maybe (Elem T.Text, T.Text)
   uncons = T.uncons
 
-instance (Parsable s, Elem s ~ Char) => Parsable (Positional s) where
-  type Elem (Positional s) = Char
+instance (Parsable s, IsNewline (Elem s), IsTab (Elem s)) => Parsable (Positional s) where
+  type Elem (Positional s) = Elem s
 
   uncons :: Positional s -> Maybe (Elem (Positional s), Positional s)
   uncons (Positional (Position l c) stream) =
     case uncons stream of
       Nothing -> Nothing
       Just (ch, nextStream) ->
-        let nextPos = case ch of
-              '\n' -> Position (l + 1) 1
-              '\t' -> Position l ((c + 4) - ((c - 1) `mod` 4))
-              _    -> Position l (c + 1)
+        let nextPos = if | isNewline ch -> Position (l + 1) 1
+                         | isTab ch     -> Position l ((c + 4) - ((c - 1) `mod` 4))
+                         | otherwise    -> Position l (c + 1)
          in Just (ch, Positional nextPos nextStream)
