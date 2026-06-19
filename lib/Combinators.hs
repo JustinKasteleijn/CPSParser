@@ -4,12 +4,14 @@
 module Combinators where
 
 import           Control.Applicative  (many, optional, some, (<|>))
+import           Control.Monad        (void)
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..))
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
 import           Predicates.IsAlpha   (IsAlpha (..))
 import           Predicates.IsDigit   (IsDigit (..))
 import           Predicates.IsNewline (IsNewline (..))
+import           Predicates.IsSpace   (IsSpace (..))
 import           Predicates.IsTab     (IsTab (..))
 
 item :: (Parsable s, ParserError s e) => Parser s e (Elem s)
@@ -84,5 +86,14 @@ sepBy1Trailing psep parser = do
 sepBy0Trailing :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
 sepBy0Trailing psep parser = sepBy1Trailing psep parser <|> pure []
 
-between :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e l -> Parser s e r -> Parser s e (Elem s) -> Parser s e (Elem s)
+between :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e l -> Parser s e r -> Parser s e a -> Parser s e a
 between pLeft pRight parser = pLeft *> parser <* pRight
+
+whitespace :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
+whitespace = void $ satisfy isSpace "whitespace" show
+
+whitespace1 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
+whitespace1 = void $ some whitespace
+
+whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
+whitespace0 = void $ many whitespace

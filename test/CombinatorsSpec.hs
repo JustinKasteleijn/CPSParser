@@ -19,6 +19,7 @@ spec = do
     testCharCombinator
     testStringCombinator
     testBetweenCombinator
+    testWhitespaceCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -99,3 +100,10 @@ testBetweenCombinator = describe "Between combinator" $ do
     runTestParser (between (char '(') (char ')') item) "(a)" ==> ('a', "")
   it "Parser fails when left boundary is not defined" $ do
     runTestParser (between (char '(') (char ')') item) "a)"  ==? (expectedButGot "'a'" "(" "", "a)")
+
+testWhitespaceCombinator :: Spec
+testWhitespaceCombinator = describe "Whitespace combinator" $ do
+  it "Consumes a single whitespace on populated input" $ do
+     runTestParser whitespace " " ==> ((), "")
+  it "Fails on non whitespace character" $ do
+    runTestParser whitespace "c"  ==? (expectedButGot "'c'" "whitespace" "", "c")
