@@ -49,7 +49,7 @@ testDigitCombinator = describe "Digit combinator" $ do
 testNewlineCombinator :: Spec
 testNewlineCombinator = describe "Newline combinator" $ do
   it "Conusmes a single newline character from a populated input" $ do
-    runTestParser newline "\n" ==> ('\n', "")
+    runTestParser newline "\n" ==> ((), "")
   it "Fails when the character is not a newline" $ do
     runTestParser newline "c" ==? (expectedButGot "'c'" "\n" "", "c")
 

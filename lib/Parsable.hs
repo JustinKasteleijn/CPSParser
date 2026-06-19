@@ -37,7 +37,7 @@ instance (Parsable s, IsNewline (Elem s), IsTab (Elem s)) => Parsable (Positiona
     case uncons stream of
       Nothing -> Nothing
       Just (ch, nextStream) ->
-        let nextPos = if | isNewline ch -> Position (l + 1) 1
+        let nextPos = if | isNewline ch -> Position (l + 1) 0
                          | isTab ch     -> Position l ((c + 4) - ((c - 1) `mod` 4))
                          | otherwise    -> Position l (c + 1)
          in Just (ch, Positional nextPos nextStream)

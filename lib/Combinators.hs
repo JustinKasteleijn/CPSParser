@@ -50,14 +50,14 @@ digits0 = many digit
 digits1 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e [Elem s]
 digits1 = some digit
 
-newline :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e (Elem s)
-newline = satisfy isNewline "\n" show
+newline :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e ()
+newline = void $ satisfy isNewline "\n" show
 
-newlines0 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e [Elem s]
-newlines0 = many newline
+newlines0 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e ()
+newlines0 = void $ many newline
 
-newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e [Elem s]
-newlines1 = some newline
+newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e ()
+newlines1 = void $ some newline
 
 tab :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
 tab = satisfy isTab "\t" show
