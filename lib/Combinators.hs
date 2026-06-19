@@ -1,8 +1,9 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeOperators    #-}
 
 module Combinators where
 
-import           Control.Applicative  (many, some)
+import           Control.Applicative  (many, some, (<|>))
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..))
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
@@ -25,6 +26,12 @@ satisfy pred expected formatActual  =
       Just (x, xs) -> if pred x
                          then success x xs
                          else failure (expectedButGot (formatActual x) expected stream) stream
+
+char :: (Parsable s, ParserError s e, Elem s ~ Char) => Char -> Parser s e (Elem s)
+char c = satisfy (== c) ("'" ++ show c ++ "'") show
+
+string :: (Parsable s, ParserError s e, Elem s ~ Char) => String -> Parser s e [Elem s]
+string = mapM char
 
 digit :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e (Elem s)
 digit = satisfy isDigit "digit '0..9'" show
