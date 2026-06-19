@@ -61,3 +61,9 @@ alpha0 = many alpha
 
 alpha1 :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e [Elem s]
 alpha1 = some alpha
+
+sepBy1 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
+sepBy1 psep parser = (:) <$> parser <*> many (psep >> parser)
+
+sepBy0 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
+sepBy0 psep parser = sepBy1 psep parser <|> pure []
