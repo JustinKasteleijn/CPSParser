@@ -3,7 +3,7 @@
 
 module Combinators where
 
-import           Control.Applicative  (many, some, (<|>))
+import           Control.Applicative  (many, optional, some, (<|>))
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..))
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
@@ -74,3 +74,12 @@ sepBy1 psep parser = (:) <$> parser <*> many (psep >> parser)
 
 sepBy0 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
 sepBy0 psep parser = sepBy1 psep parser <|> pure []
+
+sepBy1Trailing :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
+sepBy1Trailing psep parser = do
+  result <- sepBy1 psep parser
+  _      <- optional psep
+  pure result
+
+sepBy0Trailing :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
+sepBy0Trailing psep parser = sepBy1Trailing psep parser <|> pure []

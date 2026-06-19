@@ -66,13 +66,21 @@ testAlphaCombinator = describe "Alpha combinator" $ do
 testSepByCombinators :: Spec
 testSepByCombinators = describe "Sepby combinators" $ do
   it "sepBy1 consumes a single comma separated character" $ do
-    runTestParser (sepBy1 (char ',') item) "h,h"  ==> ("hh", "")
+    runTestParser (sepBy1 (char ',') item) "h,h"           ==> ("hh", "")
   it "sepBy1 leaves trailing separator" $ do
-    runTestParser (sepBy1 (char ',') item) "h,h," ==> ("hh", ",")
+    runTestParser (sepBy1 (char ',') item) "h,h,"          ==> ("hh", ",")
   it "SepBy1 fails on empty input" $ do
-    runTestParser (sepBy1 (char ',') item) ""     ==? (unexpectedEOF "", "")
+    runTestParser (sepBy1 (char ',') item) ""              ==? (unexpectedEOF "", "")
   it "SepBy0 succeeds on empty input" $ do
-    runTestParser (sepBy0 (char ',') item) ""     ==> ([], "")
+    runTestParser (sepBy0 (char ',') item) ""              ==> ([], "")
+  it "SepBy1Trailing succeeds and consumes on trailing separator" $ do
+    runTestParser (sepBy1Trailing (char ',') item) "h,h,"  ==> ("hh", "")
+  it "SepBy1Trailing succeeds without trailing separator" $ do
+      runTestParser (sepBy1Trailing (char ',') item) "h,h" ==> ("hh", "")
+  it "SepBy1Trailing fails on empty input" $ do
+      runTestParser (sepBy1Trailing (char ',') item) ""    ==? (unexpectedEOF "", "")
+  it "SepBy0Trailing fails on empty input" $ do
+      runTestParser (sepBy0Trailing (char ',') item) ""    ==> ("", "")
 
 testCharCombinator :: Spec
 testCharCombinator = describe "Char combinator" $ do
