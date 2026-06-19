@@ -6,6 +6,7 @@ import           Control.Applicative  (many, some)
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..))
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
+import           Predicates.IsAlpha   (IsAlpha (..))
 import           Predicates.IsDigit   (IsDigit (..))
 import           Predicates.IsNewline (IsNewline (..))
 import           Predicates.IsTab     (IsTab (..))
@@ -51,3 +52,12 @@ tab0 = many tab
 
 tab1 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e [Elem s]
 tab1 = some tab
+
+alpha :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e (Elem s)
+alpha = satisfy isAlpha "alpha 'a..z|A..Z'" show
+
+alpha0 :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e [Elem s]
+alpha0 = many alpha
+
+alpha1 :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e [Elem s]
+alpha1 = some alpha

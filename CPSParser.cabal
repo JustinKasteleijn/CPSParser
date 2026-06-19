@@ -25,7 +25,8 @@ library
 
                       Predicates.IsDigit,
                       Predicates.IsNewline,
-                      Predicates.IsTab
+                      Predicates.IsTab,
+                      Predicates.IsAlpha
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.18.3.0,
