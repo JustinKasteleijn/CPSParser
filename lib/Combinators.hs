@@ -7,8 +7,9 @@ module Combinators where
 import           Control.Applicative  (many, optional, some, (<|>))
 import           Control.Monad        (void)
 import           Data.Char            (digitToInt)
+import           Data.Int             (Int16, Int32, Int64, Int8)
 import           Data.List            (foldl')
-import           Data.Word            (Word64, Word8)
+import           Data.Word            (Word16, Word32, Word64, Word8)
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..), failParser)
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
@@ -127,3 +128,48 @@ parseBounded = do
                 expectedButGot
                     (show val)
                     ("a value between " ++ show (minBound :: n) ++ " and " ++ show (maxBound :: n))
+
+parseUnsignedBounded :: forall s e n. (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s), Integral n, Bounded n, Show n)
+                     => Parser s e n
+parseUnsignedBounded = do
+  val <- unsignedInt :: Parser s e Word64
+  let targetMin = fromIntegral (minBound :: n) :: Word64
+      targetMax = fromIntegral (maxBound :: n) :: Word64
+  if val >= targetMin && val <= targetMax
+     then pure (fromIntegral val)
+     else failParser $
+               expectedButGot
+                  (show val)
+                  ("a value between " ++ show (minBound :: n) ++ " and " ++ show (maxBound :: n))
+
+u8 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s))
+   => Parser s e Word8
+u8 = parseUnsignedBounded
+
+u16 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s))
+   => Parser s e Word16
+u16 = parseUnsignedBounded
+
+u32 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s))
+   => Parser s e Word32
+u32 = parseUnsignedBounded
+
+u64 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s))
+   => Parser s e Word64
+u64 = parseUnsignedBounded
+
+i8 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s), IsMinus (Elem s))
+   => Parser s e Int8
+i8 = parseBounded
+
+i16 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s), IsMinus (Elem s))
+   => Parser s e Int16
+i16 = parseBounded
+
+i32 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s), IsMinus (Elem s))
+   => Parser s e Int32
+i32 = parseBounded
+
+i64 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s), IsMinus (Elem s))
+   => Parser s e Int64
+i64 = parseBounded

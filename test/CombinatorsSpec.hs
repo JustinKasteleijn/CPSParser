@@ -129,10 +129,10 @@ testIntCombinator = describe "Int combinator" $ do
 testBoundedCombinator :: Spec
 testBoundedCombinator = describe "Int combinator" $ do
   it "Consumes value between valid min and max bound (u8)" $ do
-    runTestParser (parseBounded :: Parser String String Word8) "234" ==> (234, "")
+    runTestParser (parseUnsignedBounded :: Parser String String Word8) "234" ==> (234, "")
   it "Consumes the max bound (u8)" $ do
-    runTestParser (parseBounded :: Parser String String Word8) "255" ==> (255, "")
+    runTestParser (parseUnsignedBounded :: Parser String String Word8) "255" ==> (255, "")
   it "Consumes the min bound (u8)" $ do
-    runTestParser (parseBounded :: Parser String String Word8) "0"   ==> (0, "")
+    runTestParser (parseUnsignedBounded :: Parser String String Word8) "0"   ==> (0, "")
   it "Rejects value outside of min and max bound (u8)" $ do
-    runTestParser (parseBounded :: Parser String String Word8) "257" ==? (expectedButGot "257" "a value between 0 and 255" "", "")
+    runTestParser (parseUnsignedBounded :: Parser String String Word8) "257" ==? (expectedButGot "257" "a value between 0 and 255" "", "")
