@@ -28,7 +28,7 @@ satisfy pred expected formatActual  =
                          else failure (expectedButGot (formatActual x) expected stream) stream
 
 char :: (Parsable s, ParserError s e, Elem s ~ Char) => Char -> Parser s e (Elem s)
-char c = satisfy (== c) ("'" ++ show c ++ "'") show
+char c = satisfy (== c) [c] show
 
 string :: (Parsable s, ParserError s e, Elem s ~ Char) => String -> Parser s e [Elem s]
 string = mapM char
@@ -43,7 +43,7 @@ digit1 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Pars
 digit1 = some digit
 
 newline :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e (Elem s)
-newline = satisfy isNewline "'\n'" show
+newline = satisfy isNewline "\n" show
 
 newlines0 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e [Elem s]
 newlines0 = many newline
@@ -52,7 +52,7 @@ newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) =>
 newlines1 = some newline
 
 tab :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
-tab = satisfy isTab "'\t'" show
+tab = satisfy isTab "\t" show
 
 tab0 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e [Elem s]
 tab0 = many tab
@@ -61,7 +61,7 @@ tab1 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s
 tab1 = some tab
 
 alpha :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e (Elem s)
-alpha = satisfy isAlpha "'alpha 'a..z|A..Z'" show
+alpha = satisfy isAlpha "alpha 'a..z|A..Z'" show
 
 alpha0 :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e [Elem s]
 alpha0 = many alpha
@@ -83,3 +83,6 @@ sepBy1Trailing psep parser = do
 
 sepBy0Trailing :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
 sepBy0Trailing psep parser = sepBy1Trailing psep parser <|> pure []
+
+between :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e l -> Parser s e r -> Parser s e (Elem s) -> Parser s e (Elem s)
+between pLeft pRight parser = pLeft *> parser <* pRight

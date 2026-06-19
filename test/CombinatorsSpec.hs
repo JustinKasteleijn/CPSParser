@@ -18,6 +18,7 @@ spec = do
     testSepByCombinators
     testCharCombinator
     testStringCombinator
+    testBetweenCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -45,14 +46,14 @@ testNewlineCombinator = describe "Newline combinator" $ do
   it "Conusmes a single newline character from a populated input" $ do
     runTestParser newline "\n" ==> ('\n', "")
   it "Fails when the character is not a newline" $ do
-    runTestParser newline "c" ==? (expectedButGot "'c'" "'\n'" "", "c")
+    runTestParser newline "c" ==? (expectedButGot "'c'" "\n" "", "c")
 
 testTabCombinator :: Spec
 testTabCombinator = describe "Tab combinator" $ do
   it "Consumes a single character from a populated input" $ do
     runTestParser tab "\t" ==> ('\t', "")
   it "Fails when the character is not a tab" $ do
-    runTestParser tab "c" ==? (expectedButGot "'c'" "'\t'" "", "c")
+    runTestParser tab "c" ==? (expectedButGot "'c'" "\t" "", "c")
 
 testAlphaCombinator :: Spec
 testAlphaCombinator = describe "Alpha combinator" $ do
@@ -61,7 +62,7 @@ testAlphaCombinator = describe "Alpha combinator" $ do
   it "Consumes a single character from a upper case character populated input" $ do
     runTestParser alpha "Hello" ==> ('H', "ello")
   it "Fails when the character is not a alpha" $ do
-    runTestParser alpha "1Hello" ==? (expectedButGot "'1'" "'alpha 'a..z|A..Z'" "", "1Hello")
+    runTestParser alpha "1Hello" ==? (expectedButGot "'1'" "alpha 'a..z|A..Z'" "", "1Hello")
 
 testSepByCombinators :: Spec
 testSepByCombinators = describe "Sepby combinators" $ do
@@ -91,3 +92,10 @@ testStringCombinator :: Spec
 testStringCombinator = describe "String combinator" $ do
   it "consumes a string when string is given" $ do
     runTestParser (string "hello") "hello" ==> ("hello", "")
+
+testBetweenCombinator :: Spec
+testBetweenCombinator = describe "Between combinator" $ do
+  it "Consumes middle when boundaries are specified" $ do
+    runTestParser (between (char '(') (char ')') item) "(a)" ==> ('a', "")
+  it "Parser fails when left boundary is not defined" $ do
+    runTestParser (between (char '(') (char ')') item) "a)"  ==? (expectedButGot "'a'" "(" "", "a)")
