@@ -15,6 +15,7 @@ spec = do
     testNewlineCombinator
     testTabCombinator
     testAlphaCombinator
+    testSepByCombinators
 
 
 testItemCombinator :: Spec
@@ -60,3 +61,14 @@ testAlphaCombinator = describe "Alpha combinator" $ do
     runTestParser alpha "Hello" ==> ('H', "ello")
   it "Fails when the character is not a alpha" $ do
     runTestParser alpha "1Hello" ==? (expectedButGot "'1'" "'alpha 'a..z|A..Z'" "", "1Hello")
+
+testSepByCombinators :: Spec
+testSepByCombinators = describe "Sepby combinators" $ do
+  it "sepBy1 consumes a single comma separated character" $ do
+    runTestParser (sepBy1 (char ',') item) "h,h"  ==> ("hh", "")
+  it "sepBy1 leaves trailing separator" $ do
+    runTestParser (sepBy1 (char ',') item) "h,h," ==> ("hh", ",")
+  it "SepBy1 fails on empty input" $ do
+    runTestParser (sepBy1 (char ',') item) ""     ==? (unexpectedEOF "", "")
+  it "SepBy0 succeeds on empty input" $ do
+    runTestParser (sepBy0 (char ',') item) ""     ==> ([], "")
