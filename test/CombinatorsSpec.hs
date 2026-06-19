@@ -12,6 +12,7 @@ spec = do
     testItemCombinator
     testDigitCombinator
     testSatisfyCombinator
+    testNewlineCombinator
 
 
 testItemCombinator :: Spec
@@ -34,3 +35,10 @@ testDigitCombinator = describe "Digit combinator" $ do
     runTestParser digit "123" ==> ('1', "23")
   it "Fails when the character is not a digit" $ do
     runTestParser digit "c"   ==? (expectedButGot "'c'" "digit '0..9'" "", "c")
+
+testNewlineCombinator :: Spec
+testNewlineCombinator = describe "Newline combinator" $ do
+  it "conusmes a single newline character from a populated input" $ do
+    runTestParser newline "\n" ==> ('\n', "")
+  it "Fails when the character is not a newline" $ do
+    runTestParser newline "c" ==? (expectedButGot "'c'" "'\n'" "", "c")
