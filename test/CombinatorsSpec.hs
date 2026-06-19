@@ -142,3 +142,7 @@ testLinesCombinator :: Spec
 testLinesCombinator = describe "Lines combinator" $ do
   it "Consumes parser between lines" $ do
     runTestParser (lines1 int) "123\n456\n789" ==> ([123,456,789], "")
+  it "Lines1 fails on empty input" $ do
+    runTestParser (lines1 int) "" ==? (unexpectedEOF "", "")
+  it "Lines0 succeeds on empty input" $ do
+    runTestParser (lines0 int) "" ==> ([], "")

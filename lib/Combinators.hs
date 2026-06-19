@@ -53,11 +53,11 @@ digits1 = some digit
 newline :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e ()
 newline = void $ satisfy isNewline "\n" show
 
-newlines0 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e ()
-newlines0 = void $ many newline
+lines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e a -> Parser s e [a]
+lines1 = sepBy1 newline
 
-newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e ()
-newlines1 = void $ some newline
+lines0 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e a -> Parser s e [a]
+lines0 = sepBy0 newline
 
 tab :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
 tab = satisfy isTab "\t" show
@@ -80,7 +80,7 @@ alpha1 = some alpha
 sepBy1 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e a -> Parser s e [a]
 sepBy1 psep parser = (:) <$> parser <*> many (psep >> parser)
 
-sepBy0 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
+sepBy0 :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e a -> Parser s e [a]
 sepBy0 psep parser = sepBy1 psep parser <|> pure []
 
 sepBy1Trailing :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e sep -> Parser s e (Elem s) -> Parser s e [Elem s]
@@ -103,9 +103,6 @@ whitespace1 = void $ some whitespace
 
 whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
 whitespace0 = void $ many whitespace
-
-lines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e a -> Parser s e [a]
-lines1 = sepBy1 newline
 
 -----------------------------------------------------------------
 -- Numbers
