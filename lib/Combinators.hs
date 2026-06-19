@@ -54,7 +54,7 @@ tab1 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s
 tab1 = some tab
 
 alpha :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e (Elem s)
-alpha = satisfy isAlpha "alpha 'a..z|A..Z'" show
+alpha = satisfy isAlpha "'alpha 'a..z|A..Z'" show
 
 alpha0 :: (Parsable s, ParserError s e, IsAlpha (Elem s), Show (Elem s)) => Parser s e [Elem s]
 alpha0 = many alpha

@@ -14,6 +14,7 @@ spec = do
     testSatisfyCombinator
     testNewlineCombinator
     testTabCombinator
+    testAlphaCombinator
 
 
 testItemCombinator :: Spec
@@ -50,3 +51,12 @@ testTabCombinator = describe "Tab combinator" $ do
     runTestParser tab "\t" ==> ('\t', "")
   it "Fails when the character is not a tab" $ do
     runTestParser tab "c" ==? (expectedButGot "'c'" "'\t'" "", "c")
+
+testAlphaCombinator :: Spec
+testAlphaCombinator = describe "Alpha combinator" $ do
+  it "Consumes a single character from a lower case character populated input" $ do
+    runTestParser alpha "hello" ==> ('h', "ello")
+  it "Consumes a single character from a upper case character populated input" $ do
+    runTestParser alpha "Hello" ==> ('H', "ello")
+  it "Fails when the character is not a alpha" $ do
+    runTestParser alpha "1Hello" ==? (expectedButGot "'1'" "'alpha 'a..z|A..Z'" "", "1Hello")
