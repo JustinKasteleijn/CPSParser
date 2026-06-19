@@ -104,6 +104,16 @@ whitespace1 = void $ some whitespace
 whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
 whitespace0 = void $ many whitespace
 
+-----------------------------------------------------------------
+-- Numbers
+-----------------------------------------------------------------
+
+int :: (Parsable s, ParserError s e, IsDigit (Elem s), IsMinus (Elem s), Show (Elem s)) => Parser s e Integer
+int = signedInt
+
+nat :: (Parsable s, ParserError s e, IsDigit (Elem s) , Show (Elem s)) => Parser s e Integer
+nat = unsignedInt
+
 unsignedInt :: (Parsable s, ParserError s e, IsDigit (Elem s),Show (Elem s), Num n) => Parser s e n
 unsignedInt = foldl' (\acc d -> acc * 10 + toDigit d) 0 <$> digits1
 
