@@ -8,6 +8,7 @@ import           Parser               (Parser (..))
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
 import           Predicates.IsDigit   (IsDigit (..))
 import           Predicates.IsNewline (IsNewline (..))
+import           Predicates.IsTab     (IsTab (..))
 
 item :: (Parsable s, ParserError s e) => Parser s e (Elem s)
 item = Parser $ \stream success failure ->
@@ -41,3 +42,12 @@ newlines0 = many newline
 
 newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e [Elem s]
 newlines1 = some newline
+
+tab :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
+tab = satisfy isTab
+
+tab0 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
+tab0 = many tab
+
+tab1 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
+tab1 = some isTab
