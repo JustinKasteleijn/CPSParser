@@ -2,11 +2,12 @@
 
 module Combinators where
 
-import           Control.Applicative (many, some)
-import           Parsable            (Parsable (Elem), uncons)
-import           Parser              (Parser (..))
-import           ParserError         (ParserError (expectedButGot, unexpectedEOF))
-import           Predicates.IsDigit  (IsDigit (..))
+import           Control.Applicative  (many, some)
+import           Parsable             (Parsable (Elem), uncons)
+import           Parser               (Parser (..))
+import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
+import           Predicates.IsDigit   (IsDigit (..))
+import           Predicates.IsNewline (IsNewline (..))
 
 item :: (Parsable s, ParserError s e) => Parser s e (Elem s)
 item = Parser $ \stream success failure ->
@@ -31,3 +32,12 @@ digit0 = many digit
 
 digit1 :: (Parsable s, ParserError s e, IsDigit (Elem s), Show (Elem s)) => Parser s e [Elem s]
 digit1 = some digit
+
+newline :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e (Elem s)
+newline = satisfy isNewline "'\n'" show
+
+newlines0 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e [Elem s]
+newlines0 = many newline
+
+newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) => Parser s e [Elem s]
+newlines1 = some newline
