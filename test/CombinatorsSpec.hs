@@ -13,6 +13,7 @@ spec = do
     testDigitCombinator
     testSatisfyCombinator
     testNewlineCombinator
+    testTabCombinator
 
 
 testItemCombinator :: Spec
@@ -38,7 +39,14 @@ testDigitCombinator = describe "Digit combinator" $ do
 
 testNewlineCombinator :: Spec
 testNewlineCombinator = describe "Newline combinator" $ do
-  it "conusmes a single newline character from a populated input" $ do
+  it "Conusmes a single newline character from a populated input" $ do
     runTestParser newline "\n" ==> ('\n', "")
   it "Fails when the character is not a newline" $ do
     runTestParser newline "c" ==? (expectedButGot "'c'" "'\n'" "", "c")
+
+testTabCombinator :: Spec
+testTabCombinator = describe "Tab combinator" $ do
+  it "Consumes a single character from a populated input" $ do
+    runTestParser tab "\t" ==> ('\t', "")
+  it "Fails when the character is not a tab" $ do
+    runTestParser tab "c" ==? (expectedButGot "'c'" "'\t'" "", "c")

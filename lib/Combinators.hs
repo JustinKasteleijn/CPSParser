@@ -44,10 +44,10 @@ newlines1 :: (Parsable s, ParserError s e, IsNewline (Elem s), Show (Elem s)) =>
 newlines1 = some newline
 
 tab :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
-tab = satisfy isTab
+tab = satisfy isTab "'\t'" show
 
-tab0 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
+tab0 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e [Elem s]
 tab0 = many tab
 
-tab1 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e (Elem s)
-tab1 = some isTab
+tab1 :: (Parsable s, ParserError s e, IsTab (Elem s), Show (Elem s)) => Parser s e [Elem s]
+tab1 = some tab
