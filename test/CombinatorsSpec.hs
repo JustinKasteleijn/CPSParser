@@ -2,10 +2,10 @@ module CombinatorsSpec (spec) where
 
 import           Combinators
 import           CustomTestLib
+import           Data.Word     (Word8)
 import           Parser        (Parser)
 import           ParserError
 import           Test.Syd
-
 
 spec :: Spec
 spec = do
@@ -23,6 +23,7 @@ spec = do
     testWhitespaceCombinator
     testNatCombinator
     testIntCombinator
+    testBoundedCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -124,3 +125,14 @@ testIntCombinator :: Spec
 testIntCombinator = describe "Int combinator" $ do
   it "Consumes negative numbers as negative integers" $ do
     runTestParser (signedInt :: Parser String String Int) "-123" ==> (-123, "")
+
+testBoundedCombinator :: Spec
+testBoundedCombinator = describe "Int combinator" $ do
+  it "Consumes value between valid min and max bound (u8)" $ do
+    runTestParser (parseBounded :: Parser String String Word8) "234" ==> (234, "")
+  it "Consumes the max bound (u8)" $ do
+    runTestParser (parseBounded :: Parser String String Word8) "255" ==> (255, "")
+  it "Consumes the min bound (u8)" $ do
+    runTestParser (parseBounded :: Parser String String Word8) "0"   ==> (0, "")
+  it "Rejects value outside of min and max bound (u8)" $ do
+    runTestParser (parseBounded :: Parser String String Word8) "257" ==? (expectedButGot "257" "a value between 0 and 255" "", "")

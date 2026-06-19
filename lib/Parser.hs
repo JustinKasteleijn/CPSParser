@@ -3,7 +3,8 @@
 
 module Parser (
     Parser(..),
-    runParser
+    runParser,
+    failParser
 ) where
 import           Control.Applicative (Alternative (..))
 import           ParserError         (ParserError (emptyError))
@@ -45,6 +46,9 @@ instance (ParserError s e) => Alternative (Parser s e) where
   (<|>) :: Parser s e a -> Parser s e a -> Parser s e a
   px <|> py = Parser $ \stream success failure ->
      parse px stream success (\_ _ -> parse py stream success failure)
+
+failParser :: (s -> e) -> Parser s e a
+failParser errBuilder = Parser $ \stream _ failure -> failure (errBuilder stream) stream
 
 runParser :: Parser s e a -> s -> Either (e, s) (a, s)
 runParser (Parser p) stream = let success val rest = Right (val, rest)

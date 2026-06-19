@@ -1,5 +1,6 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeOperators    #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module Combinators where
 
@@ -7,8 +8,9 @@ import           Control.Applicative  (many, optional, some, (<|>))
 import           Control.Monad        (void)
 import           Data.Char            (digitToInt)
 import           Data.List            (foldl')
+import           Data.Word            (Word64, Word8)
 import           Parsable             (Parsable (Elem), uncons)
-import           Parser               (Parser (..))
+import           Parser               (Parser (..), failParser)
 import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
 import           Predicates.IsAlpha   (IsAlpha (..))
 import           Predicates.IsDigit   (IsDigit (..))
@@ -104,9 +106,24 @@ whitespace0 = void $ many whitespace
 unsignedInt :: (Parsable s, ParserError s e, IsDigit (Elem s),Show (Elem s), Num n) => Parser s e n
 unsignedInt = foldl' (\acc d -> acc * 10 + toDigit d) 0 <$> digits1
 
-signedInt :: (Parsable s, ParserError s e, IsDigit (Elem s), IsMinus (Elem s) ,Show (Elem s), Num n) => Parser s e n
+signedInt :: (Parsable s, ParserError s e, IsDigit (Elem s), IsMinus (Elem s), Show (Elem s), Num n) => Parser s e n
 signedInt = do
    f <- option id (negate <$ satisfy isMinus "'-'" show)
    f <$> unsignedInt
   where
     option def p = p <|> pure def
+
+parseBounded :: forall s e n.
+                (Parsable s, ParserError s e, IsDigit (Elem s), IsMinus (Elem s), Show (Elem s), Integral n, Bounded n, Show n)
+                  => Parser s e n
+parseBounded = do
+  val <- signedInt :: Parser s e Word64
+  let targetMin = fromIntegral (minBound :: n) :: Word64
+      targetMax = fromIntegral (maxBound :: n) :: Word64
+
+  if val >= targetMin && val <= targetMax
+     then pure (fromIntegral val)
+     else failParser $
+                expectedButGot
+                    (show val)
+                    ("a value between " ++ show (minBound :: n) ++ " and " ++ show (maxBound :: n))
