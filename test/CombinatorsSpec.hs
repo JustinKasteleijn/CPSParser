@@ -1,9 +1,10 @@
 module CombinatorsSpec (spec) where
 
 import           Combinators
+import           Control.Applicative
 import           CustomTestLib
-import           Data.Word     (Word8)
-import           Parser        (Parser)
+import           Data.Word           (Word8)
+import           Parser              (Parser)
 import           ParserError
 import           Test.Syd
 
@@ -25,6 +26,7 @@ spec = do
     testIntCombinator
     testBoundedCombinator
     testLinesCombinator
+    testTryCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -146,3 +148,12 @@ testLinesCombinator = describe "Lines combinator" $ do
     runTestParser (lines1 int) "" ==? (unexpectedEOF "", "")
   it "Lines0 succeeds on empty input" $ do
     runTestParser (lines0 int) "" ==> ([], "")
+
+testTryCombinator :: Spec
+testTryCombinator = describe "Try combinator" $ do
+  it "Consumes input if try succeeds" $ do
+    runTestParser (try alpha) "a" ==> ('a', "")
+  it "Consumes input on alternative when try is used for the first argument" $ do
+    runTestParser (try alpha <|> digit) "1" ==> ('1', "")
+  it "When try fails it still outputs the old stream with the error" $ do
+    runTestParser (try alpha) "1" ==? (expectedButGot "'1'" "alpha 'a..z|A..Z'" "" , "1")

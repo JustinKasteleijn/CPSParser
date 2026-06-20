@@ -25,7 +25,7 @@ instance ParserError (Positional s) String where
 
   expectedButGot :: String -> String -> Positional s -> String
   expectedButGot actual expected (Positional pos _)
-    = show pos ++ " Parser expected '" ++ expected ++ "' but got '" ++ actual ++ "'"
+    = show pos ++ " Parser expected '" ++ expected ++ "' but got " ++ actual
 
 instance ParserError String String where
   emptyError :: String -> String
@@ -35,4 +35,4 @@ instance ParserError String String where
   unexpectedEOF _ = "unexpected EOF"
 
   expectedButGot :: String -> String -> String -> String
-  expectedButGot actual expected _ = "Parser expected '" ++ expected ++ "' but got '" ++ actual ++ "'"
+  expectedButGot actual expected _ = "Parser expected '" ++ expected ++ "' but got " ++ actual
