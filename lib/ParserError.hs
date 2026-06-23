@@ -13,7 +13,7 @@ class ParserError s e where
   emptyError :: s -> e
   unexpectedEOF :: s -> e
   expectedButGot :: String -> String -> s -> e
-  lookAheadMatch :: String -> s -> e
+  unexpectedError :: String -> s -> e
 
 instance ParserError (Positional s) String where
   emptyError :: Positional s -> String
@@ -28,8 +28,8 @@ instance ParserError (Positional s) String where
   expectedButGot actual expected (Positional pos _)
     = show pos ++ " Parser expected '" ++ expected ++ "' but got " ++ actual
 
-  lookAheadMatch :: String -> Positional s -> String
-  lookAheadMatch msg (Positional pos _) = show pos ++ " Look ahead matched unwanted parser: \n\n " ++ msg
+  unexpectedError :: String -> Positional s -> String
+  unexpectedError item (Positional pos _) = show pos ++ " Parser encountered unexpected token or pattern: " ++ item
 
 instance ParserError String String where
   emptyError :: String -> String
@@ -41,5 +41,5 @@ instance ParserError String String where
   expectedButGot :: String -> String -> String -> String
   expectedButGot actual expected _ = "Parser expected '" ++ expected ++ "' but got " ++ actual
 
-  lookAheadMatch :: String -> String -> String
-  lookAheadMatch msg _ = "Look ahead matched unwanted parser \n\n " ++ msg
+  unexpectedError :: String -> String -> String
+  unexpectedError item _ = " Parser encountered unexpected token or pattern: " ++ item
