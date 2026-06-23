@@ -12,7 +12,7 @@ import           Data.List            (foldl')
 import           Data.Word            (Word16, Word32, Word64, Word8)
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..), failParser)
-import           ParserError          (ParserError (expectedButGot, unexpectedEOF))
+import           ParserError          (ParserError (expectedButGot, lookAheadMatch, unexpectedEOF))
 import           Predicates.IsAlpha   (IsAlpha (..))
 import           Predicates.IsDigit   (IsDigit (..))
 import           Predicates.IsMinus   (IsMinus (..))
@@ -110,6 +110,18 @@ try (Parser p) =
     let retry err _ = failure err stream
       in p stream success retry
 
+lookAhead :: Parser s e a -> Parser s e a
+lookAhead (Parser p) =
+  Parser $ \stream success failure ->
+      let success' val _ = success val stream
+       in p stream success' failure
+
+notFollowedBy :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e a -> Parser s e ()
+notFollowedBy (Parser p) =
+  Parser $ \stream success failure ->
+    let success' val _ = failure (lookAheadMatch "Expected parser to fail" stream) stream
+        failure' val = success ()
+      in p stream success' failure'
 -----------------------------------------------------------------
 -- Numbers
 -----------------------------------------------------------------
