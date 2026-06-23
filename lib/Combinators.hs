@@ -4,12 +4,13 @@
 
 module Combinators where
 
-import           Control.Applicative  (many, optional, some, (<|>))
+import           Control.Applicative  (empty, many, optional, some, (<|>))
 import           Control.Monad        (void)
 import           Data.Char            (digitToInt)
 import           Data.Int             (Int16, Int32, Int64, Int8)
 import           Data.List            (foldl')
 import           Data.Word            (Word16, Word32, Word64, Word8)
+import           GHC.List             (foldr')
 import           Parsable             (Parsable (Elem), uncons)
 import           Parser               (Parser (..), failParser)
 import           ParserError          (ParserError (expectedButGot, lookAheadMatch, unexpectedEOF))
@@ -103,6 +104,9 @@ whitespace1 = void $ some whitespace
 
 whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
 whitespace0 = void $ many whitespace
+
+choice :: (ParserError s e) => [Parser s e a] -> Parser s e a
+choice = foldr' (<|>) empty
 
 try :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e a -> Parser s e a
 try (Parser p) =

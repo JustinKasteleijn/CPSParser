@@ -18,7 +18,7 @@ class ParserError s e where
 instance ParserError (Positional s) String where
   emptyError :: Positional s -> String
   emptyError (Positional pos _)
-     = show pos ++ " No alternative found"
+     = show pos ++ "No alternative found"
 
   unexpectedEOF :: Positional s -> String
   unexpectedEOF (Positional pos _)

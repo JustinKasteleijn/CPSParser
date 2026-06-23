@@ -29,6 +29,7 @@ spec = do
     testTryCombinator
     testLookaheadCombinator
     testNotFollowedByCombinator
+    testChoiceCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -173,3 +174,12 @@ testNotFollowedByCombinator = describe "Not followed by combinator" $ do
     runTestParser (string "if" <* notFollowedBy alpha1) "if" ==> ("if", "")
   it "Does not consume input if the parser failed" $ do
     runTestParser (string "if" <* notFollowedBy alpha1) "ifa" ==?  (lookAheadMatch "notFollowedBy parser succeeded" "", "a")
+
+testChoiceCombinator :: Spec
+testChoiceCombinator = describe "Choice combinator" $ do
+  it "runs the first parser if it is successfull and leaves others" $ do
+    runTestParser (choice [item, item, item]) "aaa" ==> ('a', "aa")
+  it "runs other parser if first ones fail" $ do
+    runTestParser (choice [char 'b', item, item]) "aab" ==> ('a', "ab")
+  it "fails when no parser succeeds" $ do
+    runTestParser (choice [char 'b', char 'c']) "aaa" ==? (emptyError "", "aaa")
