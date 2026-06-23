@@ -30,6 +30,7 @@ spec = do
     testPeekCombinator
     testNotFollowedByCombinator
     testChoiceCombinator
+    testEofCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -177,9 +178,16 @@ testNotFollowedByCombinator = describe "Not followed by combinator" $ do
 
 testChoiceCombinator :: Spec
 testChoiceCombinator = describe "Choice combinator" $ do
-  it "runs the first parser if it is successfull and leaves others" $ do
+  it "Runs the first parser if it is successfull and leaves others" $ do
     runTestParser (choice [item, item, item]) "aaa" ==> ('a', "aa")
-  it "runs other parser if first ones fail" $ do
+  it "Runs other parser if first ones fail" $ do
     runTestParser (choice [char 'b', item, item]) "aab" ==> ('a', "ab")
-  it "fails when no parser succeeds" $ do
+  it "Fails when no parser succeeds" $ do
     runTestParser (choice [char 'b', char 'c']) "aaa" ==? (emptyError "", "aaa")
+
+testEofCombinator :: Spec
+testEofCombinator = describe "Eof combinator" $ do
+  it "Succeeds when the input is empty" $ do
+    runTestParser eof "" ==> ((), "")
+  it "Fails when the input is not empty" $ do
+    runTestParser eof "1" ==? (expectedButGot "'1'" "eof" "", "")

@@ -105,6 +105,12 @@ whitespace1 = void $ some whitespace
 whitespace0 :: (Parsable s, ParserError s e, IsSpace (Elem s), Show (Elem s)) => Parser s e ()
 whitespace0 = void $ many whitespace
 
+eof :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e ()
+eof = Parser $ \stream success failure ->
+        case uncons stream of
+          Nothing     -> success () stream
+          Just (x,xs) -> failure (expectedButGot (show x) "eof" xs) xs
+
 choice :: (ParserError s e) => [Parser s e a] -> Parser s e a
 choice = foldr' (<|>) empty
 
