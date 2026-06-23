@@ -5,7 +5,7 @@
 module Combinators where
 
 import           Control.Applicative  (empty, many, optional, some, (<|>))
-import           Control.Monad        (void)
+import           Control.Monad        (void, when)
 import           Data.Char            (digitToInt)
 import           Data.Int             (Int16, Int32, Int64, Int8)
 import           Data.List            (foldl')
@@ -20,6 +20,7 @@ import           Predicates.IsMinus   (IsMinus (..))
 import           Predicates.IsNewline (IsNewline (..))
 import           Predicates.IsSpace   (IsSpace (..))
 import           Predicates.IsTab     (IsTab (..))
+import           Prelude              hiding (takeWhile)
 
 item :: (Parsable s, ParserError s e) => Parser s e (Elem s)
 item = Parser $ \stream success failure ->
@@ -113,6 +114,21 @@ eof = Parser $ \stream success failure ->
 
 choice :: (ParserError s e) => [Parser s e a] -> Parser s e a
 choice = foldr' (<|>) empty
+
+takeUntil :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e end -> Parser s e a -> Parser s e [a]
+takeUntil until parser =
+  ([] <$ until) <|> do
+    x <- parser
+    xs <- takeUntil until parser
+    return $ x : xs
+
+takeWhile :: (Parsable s, ParserError s e, Show (Elem s)) => (Elem s -> Bool) -> Parser s e [Elem s]
+takeWhile pred = takeWhile' <|> pure []
+  where
+    takeWhile' =  do
+      x <- satisfy pred "" show
+      xs <- takeWhile pred
+      return (x:xs)
 
 try :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e a -> Parser s e a
 try (Parser p) =

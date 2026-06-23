@@ -6,6 +6,7 @@ import           CustomTestLib
 import           Data.Word           (Word8)
 import           Parser              (Parser)
 import           ParserError
+import           Prelude             hiding (takeWhile)
 import           Test.Syd
 
 spec :: Spec
@@ -31,6 +32,8 @@ spec = do
     testNotFollowedByCombinator
     testChoiceCombinator
     testEofCombinator
+    testTakeUntilCombinator
+    testTakeWhileCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -191,3 +194,25 @@ testEofCombinator = describe "Eof combinator" $ do
     runTestParser eof "" ==> ((), "")
   it "Fails when the input is not empty" $ do
     runTestParser eof "1" ==? (expectedButGot "'1'" "eof" "", "")
+
+testTakeUntilCombinator :: Spec
+testTakeUntilCombinator = describe "Take until combinator" $ do
+  it "Consumes until the predicate holds until end of input" $ do
+    runTestParser (takeUntil (char ']') alpha) "aaaa]" ==> ("aaaa", "")
+  it "Consumes until the predicate holds until the middle of the input" $ do
+    runTestParser (takeUntil (char ']') alpha) "aa]aa" ==> ("aa", "aa")
+  it "Consumes until the predicate holds until the start" $ do
+    runTestParser (takeUntil (char ']') alpha) "]aaaa" ==> ("", "aaaa")
+  it "Fails if the until parser is never found" $ do
+    runTestParser (takeUntil (char ']') alpha) "aaa" ==? (unexpectedEOF "", "")
+
+testTakeWhileCombinator :: Spec
+testTakeWhileCombinator = describe "Take while combinator" $ do
+  it "Consumes until the predicate fails, until the end of the input" $ do
+    runTestParser (takeWhile (=='a')) "aaab" ==> ("aaa", "b")
+  it "Consumes until the predicate fails, until the middle of the input" $ do
+    runTestParser (takeWhile (=='a')) "aba" ==> ("a", "ba")
+  it "Consumes until the predicate fails, until the beginning of the input" $ do
+    runTestParser (takeWhile (=='a')) "baaa" ==> ("", "baaa")
+  it "Consumes until the eof if predicate never fails" $ do
+    runTestParser (takeWhile (=='a')) "aaaa" ==> ("aaaa", "")
