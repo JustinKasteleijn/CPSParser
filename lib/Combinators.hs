@@ -119,7 +119,7 @@ lookAhead (Parser p) =
 notFollowedBy :: (Parsable s, ParserError s e, Show (Elem s)) => Parser s e a -> Parser s e ()
 notFollowedBy (Parser p) =
   Parser $ \stream success failure ->
-    let success' val _ = failure (lookAheadMatch "Expected parser to fail" stream) stream
+    let success' val _ = failure (lookAheadMatch "notFollowedBy parser succeeded" stream) stream
         failure' val = success ()
       in p stream success' failure'
 -----------------------------------------------------------------

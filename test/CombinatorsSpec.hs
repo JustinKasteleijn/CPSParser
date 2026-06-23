@@ -27,6 +27,8 @@ spec = do
     testBoundedCombinator
     testLinesCombinator
     testTryCombinator
+    testLookaheadCombinator
+    testNotFollowedByCombinator
 
 testItemCombinator :: Spec
 testItemCombinator = describe "Item combinator" $ do
@@ -157,3 +159,17 @@ testTryCombinator = describe "Try combinator" $ do
     runTestParser (try alpha <|> digit) "1" ==> ('1', "")
   it "When try fails it still outputs the old stream with the error" $ do
     runTestParser (try alpha) "1" ==? (expectedButGot "'1'" "alpha 'a..z|A..Z'" "" , "1")
+
+testLookaheadCombinator :: Spec
+testLookaheadCombinator = describe "Look head combinator" $ do
+  it "does not consume input on succes but returns parsed value" $ do
+    runTestParser (lookAhead item) "a" ==> ('a', "a")
+  it "does not consume input on failure" $ do
+    runTestParser (lookAhead (char 'a')) "b" ==? (expectedButGot "'b'" "a" "", "b")
+
+testNotFollowedByCombinator :: Spec
+testNotFollowedByCombinator = describe "Not followed by combinator" $ do
+  it "Consumes input if parser is followed by something" $ do
+    runTestParser (string "if" <* notFollowedBy alpha1) "if" ==> ("if", "")
+  it "Does not consume input if the parser failed" $ do
+    runTestParser (string "if" <* notFollowedBy alpha1) "ifa" ==?  (lookAheadMatch "notFollowedBy parser succeeded" "", "a")
