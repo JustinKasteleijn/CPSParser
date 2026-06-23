@@ -1,5 +1,6 @@
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE RankNTypes   #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE InstanceSigs  #-}
+{-# LANGUAGE RankNTypes    #-}
 
 module Parser (
     Parser(..),
@@ -18,10 +19,7 @@ newtype Parser s e a
         -> (e -> s -> r)
         -> r
     }
-
-instance Functor (Parser s e) where
-  fmap :: (a -> b) -> Parser s e a -> Parser s e b
-  fmap f px = pure f <*> px
+    deriving (Functor)
 
 instance Applicative (Parser s e) where
   pure :: a -> Parser s e a
